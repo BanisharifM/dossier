@@ -278,3 +278,15 @@ test("keyboard: a dialog starts on Cancel and gives focus back", async ({ page }
   await expect(page.getByRole("alertdialog")).toBeHidden();
   await expect(page.getByRole("button", { name: "More actions" })).toBeFocused();
 });
+
+test("axe: a dismissed posting, shown, in both schemes", async ({ page, context, baseURL }) => {
+  await sql(
+    `INSERT INTO "Posting" (id, source, "externalId", title, company, place, "dismissedAt", "updatedAt") VALUES ('a11y-dismissed', 'JSEARCH', 'a11y-dismissed', 'Product Designer', 'Ledgerly', 'Rotterdam', now(), now())`,
+  );
+  for (const scheme of ["light", "dark"]) {
+    await context.addCookies([{ name: "dossier_theme", value: scheme, url: baseURL! }]);
+    await page.goto("/jobs?view=dismissed");
+    await expect(page.getByRole("list", { name: "Postings" }).getByRole("button", { name: /^Product Designer/ })).toContainText("Dismissed");
+    await expectAccessible(page);
+  }
+});

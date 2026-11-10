@@ -317,7 +317,7 @@ function PostingList({
         const title = posting.title || "Untitled posting";
         const pillLabel = scoring[key] ? "Scoring…" : "Score";
         return (
-          <li key={key} className={cn("group relative", posting.state.dismissed && "opacity-60")}>
+          <li key={key} className="group relative">
             <button
               type="button"
               data-posting={key}
