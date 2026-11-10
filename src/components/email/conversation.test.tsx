@@ -100,6 +100,13 @@ describe("Conversation (E15-3, E15-4)", () => {
     expect(sendReplyEmail).toHaveBeenCalledWith({ emailId: "e1", body: "Hi Anna, Tuesday works." });
   });
 
+  it("says why there are no times to offer when Google can't be read", async () => {
+    vi.mocked(loadFreeSlots).mockResolvedValueOnce({ ok: false, error: "Couldn't reach Google. Try again in a moment." });
+    render(<Conversation emails={[email()]} aiReady timeZone="Europe/Berlin" />);
+    expect(await screen.findByText("No calendar times: Couldn't reach Google. Try again in a moment.")).toBeInTheDocument();
+    expect(screen.queryByText(/connect Google Calendar in Settings/)).not.toBeInTheDocument();
+  });
+
   it("offers to add an agreed interview", async () => {
     const user = userEvent.setup();
     render(<Conversation emails={[email({ confirmedAt: new Date("2026-10-22T12:00:00Z"), suggestedStatus: null })]} aiReady timeZone="Europe/Berlin" />);

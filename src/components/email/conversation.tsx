@@ -227,6 +227,8 @@ function ReplyDraft({ email, aiReady }: { email: EmailView; aiReady: boolean }) 
   const [note, setNote] = useState("");
   const [job, setJob] = useState<string | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>(null);
+  // Why there are no times, when Google couldn't be read.
+  const [slotsError, setSlotsError] = useState<string | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const [confirming, setConfirming] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -238,8 +240,11 @@ function ReplyDraft({ email, aiReady }: { email: EmailView; aiReady: boolean }) 
     let stale = false;
     void loadFreeSlots({}).then((result) => {
       if (stale) return;
-      // Without the calendar (or when Google can't be reached), offer no times rather than wait.
-      if (!result.ok) return setSlots([]);
+      // When Google can't be read, offer no times rather than wait, and say why.
+      if (!result.ok) {
+        setSlotsError(result.error);
+        return setSlots([]);
+      }
       setSlots(result.data.slots);
       setPicked(result.data.slots.slice(0, 3).map((slot) => slot.start));
     });
@@ -294,7 +299,7 @@ function ReplyDraft({ email, aiReady }: { email: EmailView; aiReady: boolean }) 
 
       {wantsSlots && (
         <div className="flex flex-col gap-2">
-          <span className="text-label text-muted">{slots === null ? "Looking at your calendar…" : slots.length > 0 ? "Times to offer, from your calendar" : "No calendar times: connect Google Calendar in Settings to offer some"}</span>
+          <span className="text-label text-muted">{slots === null ? "Looking at your calendar…" : slots.length > 0 ? "Times to offer, from your calendar" : `No calendar times: ${slotsError ?? "connect Google Calendar in Settings to offer some"}`}</span>
           {slots && slots.length > 0 && (
             <div role="group" aria-label="Times to offer" className="flex flex-wrap gap-1.5">
               {slots.map((slot) => {
