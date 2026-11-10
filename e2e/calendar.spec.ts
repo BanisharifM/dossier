@@ -1,7 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-import { connectFakeGoogle, fakeGoogle, forgetGoogle, inFakeCalendar, resetData, sql } from "./support";
+import { contrastRatio } from "../src/lib/themes";
+
+import { connectFakeGoogle, drawnColor, fakeGoogle, forgetGoogle, inFakeCalendar, resetData, sql } from "./support";
 
 // The dashboard's calendar and interviews kept in step with Google Calendar
 // (E15-6), against the fake Google (e2e/fake-google.mts).
@@ -66,6 +68,13 @@ test("shows interviews and Google's events, and keeps interviews in step both wa
   await page.goto(onDay);
   await expect(calendar.getByRole("button", { name: `${dayLabel(day)}, 1 interview, 1 event` })).toBeVisible();
   await expect(calendar.getByRole("link", { name: /Dentist/ })).toHaveAttribute("href", dentist.htmlLink);
+  // The event's dot, on the month and in the list, is all that shows it there: 3:1 in both schemes (WCAG 1.4.11).
+  const dots = [calendar.getByRole("button", { name: `${dayLabel(day)}, 1 interview, 1 event` }).locator("[aria-hidden] > span").last(), calendar.getByRole("link", { name: /Dentist/ }).locator("[aria-hidden]")];
+  for (const scheme of ["light", "dark"]) {
+    await page.evaluate((chosen) => (document.documentElement.dataset.theme = chosen), scheme);
+    for (const dot of dots) expect(contrastRatio(await drawnColor(dot, "background-color"), await drawnColor(dot.locator(".."), "background-color"))).toBeGreaterThanOrEqual(3);
+  }
+  await page.evaluate(() => delete document.documentElement.dataset.theme);
   await expect(calendar.getByRole("link", { name: /^14:00–\d\d:\d\d Interview · Lead Product Designer · Northstar Health$/ })).toHaveAttribute("href", `/applications/${northstar.id}`);
   await expectAccessible(page);
 

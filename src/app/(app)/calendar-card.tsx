@@ -141,7 +141,7 @@ export function CalendarCard({
                 {/* What's on, which the label says in words: an interview, other events. */}
                 <span aria-hidden="true" className="flex h-1.5 gap-0.5">
                   {interviews > 0 && <span className="size-1.5 rounded-full bg-primary" />}
-                  {others > 0 && <span className="size-1.5 rounded-full bg-faint" />}
+                  {others > 0 && <span className="size-1.5 rounded-full bg-muted" />}
                 </span>
               </button>
             );
