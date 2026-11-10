@@ -62,6 +62,7 @@ test("makes a section on Profile and fills it in there, and switches its format"
   await expect(page).toHaveURL(/\/profile\?section=custom/);
   await expect(page.getByRole("heading", { name: "Awards" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Awards\s*optional\s*0/ })).toBeVisible();
+  await expect(page).toHaveTitle("Awards · Profile · Dossier");
   await page.getByRole("button", { name: "+ Add an item" }).click();
   const text = page.getByRole("textbox", { name: "Text" });
   await expect(text).toBeFocused();

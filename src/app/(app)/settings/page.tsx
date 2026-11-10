@@ -37,10 +37,14 @@ import { JobSearchSection } from "./job-search-section";
 import { ScoringSection } from "./scoring-section";
 import { AboutSection, type AboutFacts, type UsagePingView } from "./about-section";
 import { ConnectorSection } from "./connector-section";
-import { settingsSectionFromParam } from "./sections";
+import { SETTINGS_SECTIONS, settingsSectionFromParam } from "./sections";
 import { SettingsScreen } from "./settings-screen";
 
-export const metadata: Metadata = { title: "Settings" };
+/** "Google · Settings", so each section's tab and history entry says which it is. */
+export async function generateMetadata({ searchParams }: PageProps<"/settings">): Promise<Metadata> {
+  const section = settingsSectionFromParam((await searchParams).section);
+  return { title: `${SETTINGS_SECTIONS.find((entry) => entry.id === section)?.label} · Settings` };
+}
 
 /** Settings (PRD §6.8); the section is in `?section=` (E10-1). */
 export default async function SettingsPage({ searchParams }: PageProps<"/settings">) {

@@ -278,3 +278,17 @@ test("keyboard: a dialog starts on Cancel and gives focus back", async ({ page }
   await expect(page.getByRole("alertdialog")).toBeHidden();
   await expect(page.getByRole("button", { name: "More actions" })).toBeFocused();
 });
+
+test("titles: each Profile and Settings section names itself in the page title", async ({ page }) => {
+  await page.goto("/profile");
+  await expect(page).toHaveTitle("Basics · Profile · Dossier");
+  await page.getByRole("navigation", { name: "Profile sections" }).getByRole("link", { name: /^Skills/ }).click();
+  await expect(page).toHaveTitle("Skills · Profile · Dossier");
+  await page.getByRole("navigation", { name: "Profile sections" }).getByRole("link", { name: "+ Add a section" }).click();
+  await expect(page).toHaveTitle("Add a section · Profile · Dossier");
+
+  await page.goto("/settings");
+  await expect(page).toHaveTitle("AI provider · Settings · Dossier");
+  await page.getByRole("navigation", { name: "Settings sections" }).getByRole("link", { name: "Google" }).click();
+  await expect(page).toHaveTitle("Google · Settings · Dossier");
+});
