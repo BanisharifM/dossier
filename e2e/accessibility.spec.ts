@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import { resetData, sql } from "./support";
 
@@ -277,4 +277,20 @@ test("keyboard: a dialog starts on Cancel and gives focus back", async ({ page }
   await page.keyboard.press("Escape");
   await expect(page.getByRole("alertdialog")).toBeHidden();
   await expect(page.getByRole("button", { name: "More actions" })).toBeFocused();
+});
+
+test("targets: a chip's × is at least 24 by 24 px (WCAG 2.5.8)", async ({ page }) => {
+  const expectTarget = async (target: Locator) => {
+    const box = (await target.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(24);
+    expect(box.height).toBeGreaterThanOrEqual(24);
+  };
+  await page.goto("/profile?section=skills");
+  await expectTarget(page.getByRole("button", { name: /^Remove / }).first());
+
+  await page.goto(application);
+  const summary = page.locator('[data-unit="summary"]');
+  await summary.hover();
+  await summary.getByRole("button", { name: "Ask AI" }).click();
+  await expectTarget(page.getByRole("button", { name: "Stop asking about the summary" }));
 });

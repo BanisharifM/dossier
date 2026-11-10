@@ -66,7 +66,7 @@ export function RemovableChip({
         type="button"
         onClick={onRemove}
         aria-label={removeLabel}
-        className="rounded-full px-1 text-sm leading-none text-muted hover:text-ink"
+        className="-my-0.5 inline-flex size-6 items-center justify-center rounded-full text-sm leading-none text-muted hover:text-ink"
       >
         <span aria-hidden="true">×</span>
       </button>

@@ -138,7 +138,7 @@ export function RefinePanel({
                     type="button"
                     aria-label={`Stop asking about the ${target.name}`}
                     onClick={onClearTarget}
-                    className="rounded-full px-1 text-[13px] leading-none text-muted hover:text-ink"
+                    className="-my-1 inline-flex size-6 items-center justify-center rounded-full text-[13px] leading-none text-muted hover:text-ink"
                   >
                     ×
                   </button>
