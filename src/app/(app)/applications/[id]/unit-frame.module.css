@@ -22,16 +22,19 @@
 }
 
 /* Keyboard focus counts, focus left behind by a click doesn't: it would keep a
-   second toolbar open next to the one under the pointer. */
+   second toolbar open next to the one under the pointer. The highlight, the
+   ring, the glow and the Check this badge are on the page, so they keep the
+   light scheme's colours to read on the paper in either scheme, as the page
+   breaks do (document.module.css). */
 .frame:hover::before,
 .frame:focus-visible::before,
 .frame:has(:focus-visible)::before,
 .editing::before {
-  background: var(--color-hover);
+  background: rgb(29 28 26 / 0.05);
 }
 
 .frame:focus-visible::before {
-  outline: 2px solid var(--color-ink);
+  outline: 2px solid #1d1c1a;
 }
 
 /* After a save or an AI change: a short yellow glow that fades out. */
@@ -42,7 +45,7 @@
 @keyframes flash {
   from,
   40% {
-    background: var(--color-flash);
+    background: oklch(0.95 0.05 90);
   }
 }
 
@@ -79,6 +82,9 @@
 
 /* In the margin before the unit, so it doesn't move the text. */
 .check {
+  border-color: oklch(0.85 0.06 85);
+  background: oklch(0.94 0.04 85);
+  color: #6b4f1a;
   position: absolute;
   inset-inline-end: calc(100% + var(--u) * 12);
   top: 0.1em;
@@ -110,6 +116,6 @@
 
   .flash::before {
     animation-duration: 0.01s;
-    background: var(--color-flash);
+    background: oklch(0.95 0.05 90);
   }
 }

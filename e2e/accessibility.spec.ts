@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { contrastRatio } from "../src/lib/themes";
+
 import { resetData, sql } from "./support";
 
 // Accessibility (E11-3, PRD §11: WCAG 2.2 AA). axe finds no serious or
@@ -277,4 +279,26 @@ test("keyboard: a dialog starts on Cancel and gives focus back", async ({ page }
   await page.keyboard.press("Escape");
   await expect(page.getByRole("alertdialog")).toBeHidden();
   await expect(page.getByRole("button", { name: "More actions" })).toBeFocused();
+});
+
+test("contrast: on the white page, a part's focus ring and Check this read in the dark scheme (WCAG 2.4.7, 1.4.11)", async ({ page, context, baseURL }) => {
+  const flag = (summary: string) =>
+    sql(`UPDATE "Document" SET units = (SELECT jsonb_agg(CASE WHEN unit->>'id' = 'summary' THEN ${summary} ELSE unit END) FROM jsonb_array_elements(units::jsonb) unit) WHERE "applicationId" = $1 AND kind = 'RESUME'`, [
+      application.split("/").pop(),
+    ]);
+  await flag(`unit || '{"unverified": ["10 years"]}'`);
+  await context.addCookies([{ name: "dossier_theme", value: "dark", url: baseURL! }]);
+  await page.goto(application);
+  await expect(page.getByRole("button", { name: "Check this: “10 years”" })).toBeVisible();
+  await expectAccessible(page);
+
+  const summary = page.locator('[data-unit="summary"]');
+  await page.getByRole("tab", { name: "Resume" }).focus();
+  for (let step = 0; step < 20 && !(await summary.evaluate((element) => element === document.activeElement)); step++) {
+    await page.keyboard.press("Tab");
+  }
+  const ring = await summary.evaluate((element) => getComputedStyle(element, "::before").outlineColor);
+  const hex = `#${ring.match(/\d+/g)!.slice(0, 3).map((channel) => Number(channel).toString(16).padStart(2, "0")).join("")}`;
+  expect(contrastRatio(hex, "#ffffff")).toBeGreaterThanOrEqual(3);
+  await flag(`unit - 'unverified'`);
 });

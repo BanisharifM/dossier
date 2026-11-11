@@ -188,7 +188,7 @@ function CheckThis({ facts }: { facts: string[] }) {
         title="Check this"
         className={cn(
           styles.check,
-          "grid size-4 place-items-center rounded-full border border-warning-line bg-warning-surface font-sans text-[11px] leading-none font-bold text-warning",
+          "grid size-4 place-items-center rounded-full border font-sans text-[11px] leading-none font-bold",
         )}
       >
         !
